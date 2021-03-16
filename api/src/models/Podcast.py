@@ -1,5 +1,6 @@
 from .AudioFile import AudioFile
-from api import db
+from api import db, ma
+from marshmallow import fields, validates, validate
 
 class Podcast(AudioFile):
     __tablename__ = None
@@ -17,3 +18,13 @@ class Podcast(AudioFile):
 
     def __repr__(self):
         return f"name: {self.name}, Audio type: {self.audio_type}, Host:{self.host}"
+
+class PodcastSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Podcast
+        load_instance = True
+    
+    id = fields.Integer(required=True)
+    name = fields.Str(required=True, validate=validate.Length(min=1, max=100))
+    duration = fields.Integer(required=True, validate=validate.Range(min=0))
+    host = fields.Str(required=True, validate=validate.Length(min=1, max=100))

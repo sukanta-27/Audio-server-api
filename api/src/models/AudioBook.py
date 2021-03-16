@@ -1,5 +1,6 @@
 from .AudioFile import AudioFile
-from api import db
+from api import db, ma
+from marshmallow import fields, validate, validates
 
 class AudioBook(AudioFile):
     __tablename__ = None
@@ -19,3 +20,14 @@ class AudioBook(AudioFile):
     def __repr__(self):
         return f"name: {self.name}, Audio type: {self.audio_type}, \
             Author: {self.author}, narrator: {self.narrator}"
+
+class AudioBookSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = AudioBook
+        load_instance = True
+    
+    id = fields.Integer(required=True)
+    name = fields.Str(required=True, validate=validate.Length(min=1, max=100))
+    duration = fields.Integer(required=True, validate=validate.Range(min=0))
+    author = fields.Str(required=True, validate=validate.Length(min=1, max=100))
+    narrator = fields.Str(required=True, validate=validate.Length(min=1, max=100))
