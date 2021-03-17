@@ -12,8 +12,14 @@ class AudioFileResource(Resource):
             return False
         return True
     
-    def get(self, audioFileType, audioFileID):
+    def isValidInput(self, audioFileType, audioFileID):
         if self.isValidAudioFileType(audioFileType) and audioFileID.isnumeric():
+            return True
+
+        return False
+
+    def get(self, audioFileType, audioFileID):
+        if self.isValidInput(audioFileType, audioFileID):
             responseData = None
             audioFileID = int(audioFileID)
             
@@ -46,13 +52,13 @@ class AudioFileResource(Resource):
         return {'Message': 'AudioFileType or AudioFileID is not valid'}, 400 
 
     def put(self, audioFileType, audioFileID):
-        if self.isValidAudioFileType(audioFileType) and isinstance(audioFileID, int):
+        if self.isValidInput(audioFileType, audioFileID):
             pass
 
         return {'Message': 'AudioFileType or AudioFileID is not valid'}, 400
     
     def delete(self, audioFileType, audioFileID):
-        if self.isValidAudioFileType(audioFileType) and isinstance(audioFileID, int):
+        if self.isValidInput(audioFileType, audioFileID):
             pass
 
         return {'Message': 'AudioFileType or AudioFileID is not valid'}, 400
