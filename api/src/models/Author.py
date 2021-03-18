@@ -12,3 +12,10 @@ class Author(Person):
 
     def __repr__(self):
         return f"Author: {self.name}"
+
+class AuthorSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Author
+        load_instance = True
+
+    name = fields.Str(required=True, validate=validate.Length(min=1, max=100))

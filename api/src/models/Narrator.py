@@ -12,3 +12,10 @@ class Narrator(Person):
 
     def __repr__(self):
         return f"Narrator: {self.name}"
+
+class NarratorSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Narrator
+        load_instance = True
+
+    name = fields.Str(required=True, validate=validate.Length(min=1, max=100))
