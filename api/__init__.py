@@ -13,7 +13,9 @@ Migrate(app, db)
 
 from api.src.resources.AudioFileResource import AudioFileResource
 from api.src.resources.CreateAudioResource import CreateAudioResource
+from api.src.resources.AudioListResource import AudioListResource
 
 restful_api = Api(app)
-restful_api.add_resource(AudioFileResource, '/<string:audioFileType>/<string:audioFileID>')
 restful_api.add_resource(CreateAudioResource, '/')
+restful_api.add_resource(AudioListResource, '/<string:audioFileType>')
+restful_api.add_resource(AudioFileResource, '/<string:audioFileType>/<string:audioFileID>')
