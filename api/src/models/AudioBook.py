@@ -1,12 +1,27 @@
 from .AudioFile import AudioFile
 from api import db, ma
+from api.src.models.Person import Person
+from api.src.models.Author import Author
+from api.src.models.Narrator import Narrator
 from marshmallow import fields, validate, validates
 
 class AudioBook(AudioFile):
     __tablename__ = None
 
-    author = db.Column(db.String(100))
-    narrator = db.Column(db.String(100))
+    author_id = db.Column(db.Integer, db.ForeignKey('author.id'), nullable=False)
+    author = db.relationship(
+        'Author',
+        backref='audiobooks',
+        foreign_keys=[author_id]
+    )
+    narrator_id = db.Column(db.Integer, db.ForeignKey('narrator.id'), nullable=False)
+    narrator = db.relationship(
+        'Narrator',
+        backref='audiobooks',
+        foreign_keys=[narrator_id]
+    )    
+    # author = db.Column(db.String(100))
+    # narrator = db.Column(db.String(100))
 
     __mapper_args__ = {
         'polymorphic_identity':'audiobook'

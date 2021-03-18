@@ -3,10 +3,9 @@ from .Person import Person
 from marshmallow import fields, validate
 
 class Narrator(Person):
-    __tablename__ = None
+    __tablename__ = "narrator"
+    id = db.Column(db.Integer, db.ForeignKey('person.id'), primary_key=True)
 
-    audiobook_id = db.Column(db.Integer, db.ForeignKey('audiobook.id'), nullable=False)
-    
     __mapper_args__= {
         'polymorphic_identity': 'narrator'
     }
