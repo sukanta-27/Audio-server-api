@@ -11,10 +11,11 @@ class Narrator(Person):
     }
 
     def __repr__(self):
-        return f"Narrator: {self.name}"
+        return f"{self.name}"
 
 class NarratorSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
+        fields = ('name',)
         model = Narrator
         load_instance = True
 

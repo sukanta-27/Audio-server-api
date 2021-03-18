@@ -11,10 +11,11 @@ class Author(Person):
     }
 
     def __repr__(self):
-        return f"Author: {self.name}"
+        return f"{self.name}"
 
 class AuthorSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
+        fields = ('name',)
         model = Author
         load_instance = True
 

@@ -1,9 +1,9 @@
 from .AudioFile import AudioFile
 from api import db, ma
 from api.src.models.Person import Person
-from api.src.models.Author import Author
-from api.src.models.Narrator import Narrator
-from marshmallow import fields, validate, validates
+from api.src.models.Author import Author, AuthorSchema
+from api.src.models.Narrator import Narrator, NarratorSchema
+from marshmallow import fields, validate, post_load
 
 class AudioBook(AudioFile):
     __tablename__ = 'audiobook'
@@ -39,11 +39,23 @@ class AudioBook(AudioFile):
 
 class AudioBookSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
-        fields = ('id', 'name', 'duration', 'author', 'narrator', 'uploaded_time')
+        ordered = True
+        fields = ('id','name', 'duration', 'author', 'narrator', 'uploaded_time')
         model = AudioBook
-        load_instance = True
+        # load_instance = True
     
+    id = fields.Str(dump_only=True)
     name = fields.Str(required=True, validate=validate.Length(min=1, max=100))
     duration = fields.Integer(required=True, validate=validate.Range(min=0))
-    author = fields.Str(required=True, validate=validate.Length(min=1, max=100))
-    narrator = fields.Str(required=True, validate=validate.Length(min=1, max=100))
+    # author = fields.Nested(AuthorSchema(only=('name',)))
+    # narrator = fields.Nested(NarratorSchema(only=('name',)))
+
+    # Add Str field instead of Nested to support only passing string instead of JSON
+    author = fields.Str(required=True)
+    narrator = fields.Str(required=True)
+
+    @post_load
+    def make_instance(self, data, **kwargs):
+        data['author'] = AuthorSchema().load({"name": data["author"]})
+        data['narrator'] = NarratorSchema().load({"name": data["narrator"]})
+        return AudioBook(**data)
