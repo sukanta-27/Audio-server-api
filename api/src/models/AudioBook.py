@@ -6,8 +6,9 @@ from api.src.models.Narrator import Narrator
 from marshmallow import fields, validate, validates
 
 class AudioBook(AudioFile):
-    __tablename__ = None
+    __tablename__ = 'audiobook'
 
+    id = db.Column(db.Integer, db.ForeignKey('audiofile.id'), primary_key=True)
     author_id = db.Column(db.Integer, db.ForeignKey('author.id'), nullable=False)
     author = db.relationship(
         'Author',
