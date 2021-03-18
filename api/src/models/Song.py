@@ -3,7 +3,10 @@ from api import db, ma
 from marshmallow import fields, validate, validates
 
 class Song(AudioFile):
-    __tablename__ = None
+    __tablename__ = 'song'
+    
+    id = db.Column(db.Integer, db.ForeignKey('audiofile.id'), primary_key=True)
+
     __mapper_args__ = {
         'polymorphic_identity':'song'
     }

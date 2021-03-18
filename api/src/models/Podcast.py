@@ -1,12 +1,33 @@
 from .AudioFile import AudioFile
+from .Person import Person
+from .Host import Host, HostSchema
+from .Participant import Participant, ParticipantSchema
 from api import db, ma
 from marshmallow import fields, validates, validate
 
-class Podcast(AudioFile):
-    __tablename__ = None
+participantList = db.Table(
+    'participantList',
+    db.Column('participant_id', db.Integer, db.ForeignKey('participant.id'), primary_key=True),
+    db.Column('podcast_id', db.Integer, db.ForeignKey('podcast.id'), primary_key=True),
+    extend_existing=True 
+)
 
-    host = db.Column(db.String(100))
-    # TODO: Set participant list column with max 10 participants
+class Podcast(AudioFile):
+    __tablename__ = 'podcast'
+
+    id = db.Column(db.Integer, db.ForeignKey('audiofile.id'), primary_key=True)
+    host_id = db.Column(db.Integer, db.ForeignKey('host.id'), nullable=False)
+    host = db.relationship(
+        'Host',
+        backref="podcasts"
+    )
+    
+    participants = db.relationship(
+        'Participant',
+        secondary=participantList,
+        lazy='subquery',
+        backref=db.backref('podcasts', lazy=True)
+    )
 
     __mapper_args__ = {
         'polymorphic_identity':'podcast'
