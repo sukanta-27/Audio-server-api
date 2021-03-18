@@ -11,10 +11,11 @@ class Participant(Person):
     }
 
     def __repr__(self):
-        return f"Participant: {self.name}"
+        return f"{self.name}"
 
 class ParticipantSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
+        fields = ("name",)
         model = Participant
         load_instance = True
 

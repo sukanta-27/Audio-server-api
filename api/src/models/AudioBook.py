@@ -34,8 +34,7 @@ class AudioBook(AudioFile):
         self.narrator = narrator
 
     def __repr__(self):
-        return f"name: {self.name}, Audio type: {self.audio_type}, \
-            Author: {self.author}, narrator: {self.narrator}"
+        return f"name: {self.name}, Audio type: {self.audio_type}, Author: {self.author}, narrator: {self.narrator}"
 
 class AudioBookSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
@@ -51,8 +50,8 @@ class AudioBookSchema(ma.SQLAlchemyAutoSchema):
     # narrator = fields.Nested(NarratorSchema(only=('name',)))
 
     # Add Str field instead of Nested to support only passing string instead of JSON
-    author = fields.Str(required=True)
-    narrator = fields.Str(required=True)
+    author = fields.Str(required=True, validate=validate.Length(min=1, max=100))
+    narrator = fields.Str(required=True, validate=validate.Length(min=1, max=100))
 
     @post_load
     def make_instance(self, data, **kwargs):

@@ -3,7 +3,7 @@ from .Person import Person
 from .Host import Host, HostSchema
 from .Participant import Participant, ParticipantSchema
 from api import db, ma
-from marshmallow import fields, validates, validate
+from marshmallow import fields, validate, post_load, ValidationError
 
 participantList = db.Table(
     'participantList',
@@ -33,19 +33,38 @@ class Podcast(AudioFile):
         'polymorphic_identity':'podcast'
     }
 
-    def __init__(self, name, duration, host, **kwargs):
+    def __init__(self, name, duration, host, participants=[], **kwargs):
         AudioFile.__init__(self, name, duration)
         self.host = host
+        self.participants.extend(participants)
 
     def __repr__(self):
         return f"name: {self.name}, Audio type: {self.audio_type}, Host:{self.host}"
 
 class PodcastSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
-        fields = ("id", "name", "duration", "host", "uploaded_time")
+        fields = ("id", "name", "duration", "host", "participants", "uploaded_time")
         model = Podcast
         load_instance = True
     
+    id = fields.Integer(dump_only=True)
     name = fields.Str(required=True, validate=validate.Length(min=1, max=100))
     duration = fields.Integer(required=True, validate=validate.Range(min=0))
     host = fields.Str(required=True, validate=validate.Length(min=1, max=100))
+    participants = fields.List(fields.Str(validate=validate.Length(min=1, max=100)))
+
+    @post_load
+    def make_instance(self, data, **kwargs):
+        # Make Participants field optional
+        if "participants" not in data:
+            data["participants"] = []
+        
+        # Add limit of 10 participants
+        if len(data["participants"]) > 10:
+            raise ValidationError("Podcast can not have more than 10 participants")
+
+        # Arrange participants in correct format and create Participant object list
+        participantList = [{"name": i} for i in data["participants"]]
+        data["participants"] = [ParticipantSchema().load(i) for i in participantList]
+        data["host"] = HostSchema().load({"name": data["host"]})
+        return Podcast(**data)

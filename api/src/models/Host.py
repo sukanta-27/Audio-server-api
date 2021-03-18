@@ -11,10 +11,11 @@ class Host(Person):
     }
 
     def __repr__(self):
-        return f"Host: {self.name}"
+        return f"{self.name}"
 
 class HostSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
+        fields = ("name",)
         model = Host
         load_instance = True
 
