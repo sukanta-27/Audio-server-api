@@ -59,6 +59,40 @@ class AudioFileResource(Resource):
     
     def delete(self, audioFileType, audioFileID):
         if self.isValidInput(audioFileType, audioFileID):
-            pass
+            audioFileID = int(audioFileID)
+            responseData = {}
+            status_code = 400
 
+            if audioFileType == 'song':
+                song = Song.query.filter_by(id=audioFileID).first()
+                if song:
+                    db.session.delete(song)
+                    db.session.commit()
+                    responseData['Message'] = 'Successfully deleted record'
+                    status_code = 200
+                else:
+                    responseData['Message'] = f"No Song with id:{audioFileID} found"
+
+            elif audioFileType == 'podcast':
+                podcast = Podcast.query.filter_by(id=audioFileID).first()
+                if podcast:
+                    db.session.delete(podcast)
+                    db.session.commit()
+                    responseData['Message'] = 'Successfully deleted record'
+                    status_code = 200
+                else:
+                    responseData['Message'] = f"No Podcast with id:{audioFileID} found"
+
+            elif audioFileType == 'audiobook':
+                audiobook = AudioBook.query.filter_by(id=audioFileID).first()
+                if audiobook:
+                    db.session.delete(audiobook)
+                    db.session.commit()
+                    responseData['Message'] = 'Successfully deleted record'
+                    status_code = 200
+                else:
+                    responseData['Message'] = f"No Audiobook with id:{audioFileID} found"
+
+            return responseData, status_code
+               
         return {'Message': 'AudioFileType or AudioFileID is not valid'}, 400
