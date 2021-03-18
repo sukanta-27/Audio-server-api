@@ -13,10 +13,9 @@ class Song(AudioFile):
 
 class SongSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
-        fields = ('id', 'name', 'duration')
+        fields = ('id', 'name', 'duration', "uploaded_time")
         model = Song
         load_instance = True
     
-    id = fields.Integer(required=True)
     name = fields.Str(required=True, validate=validate.Length(min=1, max=100))
     duration = fields.Integer(required=True, validate=validate.Range(min=0))

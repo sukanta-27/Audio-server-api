@@ -21,10 +21,10 @@ class Podcast(AudioFile):
 
 class PodcastSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
+        fields = ("id", "name", "duration", "host", "uploaded_time")
         model = Podcast
         load_instance = True
     
-    id = fields.Integer(required=True)
     name = fields.Str(required=True, validate=validate.Length(min=1, max=100))
     duration = fields.Integer(required=True, validate=validate.Range(min=0))
     host = fields.Str(required=True, validate=validate.Length(min=1, max=100))

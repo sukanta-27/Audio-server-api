@@ -23,10 +23,10 @@ class AudioBook(AudioFile):
 
 class AudioBookSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
+        fields = ('id', 'name', 'duration', 'author', 'narrator', 'uploaded_time')
         model = AudioBook
         load_instance = True
     
-    id = fields.Integer(required=True)
     name = fields.Str(required=True, validate=validate.Length(min=1, max=100))
     duration = fields.Integer(required=True, validate=validate.Range(min=0))
     author = fields.Str(required=True, validate=validate.Length(min=1, max=100))

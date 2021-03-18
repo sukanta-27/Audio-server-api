@@ -12,5 +12,8 @@ ma = Marshmallow(app)
 Migrate(app, db)
 
 from api.src.resources.AudioFileResource import AudioFileResource
+from api.src.resources.CreateAudioResource import CreateAudioResource
+
 restful_api = Api(app)
 restful_api.add_resource(AudioFileResource, '/<string:audioFileType>/<string:audioFileID>')
+restful_api.add_resource(CreateAudioResource, '/')
