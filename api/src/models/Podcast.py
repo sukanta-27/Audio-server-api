@@ -4,6 +4,7 @@ from .Host import Host, HostSchema
 from .Participant import Participant, ParticipantSchema
 from api import db, ma
 from marshmallow import fields, validate, post_load, ValidationError
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 
 participantList = db.Table(
     'participantList',
@@ -41,8 +42,9 @@ class Podcast(AudioFile):
     def __repr__(self):
         return f"name: {self.name}, Audio type: {self.audio_type}, Host:{self.host}"
 
-class PodcastSchema(ma.SQLAlchemyAutoSchema):
+class PodcastSchema(SQLAlchemyAutoSchema):
     class Meta:
+        ordered = True
         fields = ("id", "name", "duration", "host", "participants", "uploaded_time")
         model = Podcast
         load_instance = True
@@ -52,6 +54,7 @@ class PodcastSchema(ma.SQLAlchemyAutoSchema):
     duration = fields.Integer(required=True, validate=validate.Range(min=0))
     host = fields.Str(required=True, validate=validate.Length(min=1, max=100))
     participants = fields.List(fields.Str(validate=validate.Length(min=1, max=100)))
+    uploaded_time = fields.DateTime(dump_only=True)
 
     @post_load
     def make_instance(self, data, **kwargs):
@@ -65,6 +68,6 @@ class PodcastSchema(ma.SQLAlchemyAutoSchema):
 
         # Arrange participants in correct format and create Participant object list
         participantList = [{"name": i} for i in data["participants"]]
-        data["participants"] = [ParticipantSchema().load(i) for i in participantList]
-        data["host"] = HostSchema().load({"name": data["host"]})
+        data["participants"] = [ParticipantSchema().load(i, session=db.session) for i in participantList]
+        data["host"] = HostSchema().load({"name": data["host"]}, session=db.session)
         return Podcast(**data)

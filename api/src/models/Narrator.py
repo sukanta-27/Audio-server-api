@@ -1,6 +1,7 @@
 from api import db, ma
 from .Person import Person
 from marshmallow import fields, validate
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 
 class Narrator(Person):
     __tablename__ = "narrator"
@@ -13,7 +14,7 @@ class Narrator(Person):
     def __repr__(self):
         return f"{self.name}"
 
-class NarratorSchema(ma.SQLAlchemyAutoSchema):
+class NarratorSchema(SQLAlchemyAutoSchema):
     class Meta:
         fields = ('name',)
         model = Narrator

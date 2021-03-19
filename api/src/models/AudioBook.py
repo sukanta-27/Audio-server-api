@@ -4,6 +4,7 @@ from api.src.models.Person import Person
 from api.src.models.Author import Author, AuthorSchema
 from api.src.models.Narrator import Narrator, NarratorSchema
 from marshmallow import fields, validate, post_load
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 
 class AudioBook(AudioFile):
     __tablename__ = 'audiobook'
@@ -36,12 +37,12 @@ class AudioBook(AudioFile):
     def __repr__(self):
         return f"name: {self.name}, Audio type: {self.audio_type}, Author: {self.author}, narrator: {self.narrator}"
 
-class AudioBookSchema(ma.SQLAlchemyAutoSchema):
+class AudioBookSchema(SQLAlchemyAutoSchema):
     class Meta:
         ordered = True
         fields = ('id','name', 'duration', 'author', 'narrator', 'uploaded_time')
         model = AudioBook
-        # load_instance = True
+        load_instance = True
     
     id = fields.Str(dump_only=True)
     name = fields.Str(required=True, validate=validate.Length(min=1, max=100))
@@ -55,6 +56,6 @@ class AudioBookSchema(ma.SQLAlchemyAutoSchema):
 
     @post_load
     def make_instance(self, data, **kwargs):
-        data['author'] = AuthorSchema().load({"name": data["author"]})
-        data['narrator'] = NarratorSchema().load({"name": data["narrator"]})
+        data['author'] = AuthorSchema().load({"name": data["author"]}, session=db.session)
+        data['narrator'] = NarratorSchema().load({"name": data["narrator"]}, session=db.session)
         return AudioBook(**data)

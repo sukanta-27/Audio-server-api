@@ -1,6 +1,7 @@
 from api import db, ma
 from .Person import Person
 from marshmallow import fields, validate
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 
 class Participant(Person):
     __tablename__ = "participant"
@@ -13,7 +14,7 @@ class Participant(Person):
     def __repr__(self):
         return f"{self.name}"
 
-class ParticipantSchema(ma.SQLAlchemyAutoSchema):
+class ParticipantSchema(SQLAlchemyAutoSchema):
     class Meta:
         fields = ("name",)
         model = Participant

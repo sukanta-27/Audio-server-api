@@ -1,6 +1,7 @@
 from api import db, ma
 from .Person import Person
 from marshmallow import fields, validate
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 
 class Host(Person):
     __tablename__ = "host"
@@ -13,7 +14,7 @@ class Host(Person):
     def __repr__(self):
         return f"{self.name}"
 
-class HostSchema(ma.SQLAlchemyAutoSchema):
+class HostSchema(SQLAlchemyAutoSchema):
     class Meta:
         fields = ("name",)
         model = Host

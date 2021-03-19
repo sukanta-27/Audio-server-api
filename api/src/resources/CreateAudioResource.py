@@ -21,7 +21,7 @@ class CreateAudioResource(Resource):
                 schema = AudioBookSchema()
 
             try:
-                record = schema.load(data['audioFileMetadata'])
+                record = schema.load(data['audioFileMetadata'], session=db.session)
                 if record:
                     db.session.add(record)
                     db.session.commit()
