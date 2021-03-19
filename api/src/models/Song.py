@@ -12,11 +12,25 @@ class Song(AudioFile):
         'polymorphic_identity':'song'
     }
 
+    @staticmethod
+    def find(id):
+        return Song.query.get(id)
+
+    @staticmethod
+    def find(data, record):
+        if "name" in data:
+            record.name = data["name"]
+        if "duration" in data:
+            record.duration = data["duration"]
+        
+        return record
+
     def __repr__(self):
         return f"name: {self.name}, Audio type: {self.audio_type}, Uploaded:{self.uploaded_time}"
 
 class SongSchema(SQLAlchemyAutoSchema):
     class Meta:
+        ordered = True
         fields = ('id', 'name', 'duration', "uploaded_time")
         model = Song
         load_instance = True

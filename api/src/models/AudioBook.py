@@ -34,6 +34,23 @@ class AudioBook(AudioFile):
         self.author = author
         self.narrator = narrator
 
+    @staticmethod
+    def find(id):
+        return AudioBook.query.get(id)
+
+    @staticmethod
+    def update(data, record):
+        if "name" in data:
+            record.name = data["name"]
+        if "duration" in data:
+            record.duration = data["duration"]
+        if "author" in data:
+            record.author = data["author"]
+        if "narrator" in data:
+            record.narrator = data["narrator"]
+        
+        return record
+
     def __repr__(self):
         return f"name: {self.name}, Audio type: {self.audio_type}, Author: {self.author}, narrator: {self.narrator}"
 
@@ -54,8 +71,18 @@ class AudioBookSchema(SQLAlchemyAutoSchema):
     author = fields.Str(required=True, validate=validate.Length(min=1, max=100))
     narrator = fields.Str(required=True, validate=validate.Length(min=1, max=100))
 
-    @post_load
-    def make_instance(self, data, **kwargs):
-        data['author'] = AuthorSchema().load({"name": data["author"]}, session=db.session)
-        data['narrator'] = NarratorSchema().load({"name": data["narrator"]}, session=db.session)
-        return AudioBook(**data)
+    @post_load(pass_original=True)
+    def make_instance(self, data, id, **kwargs):
+
+        # Check if record exists
+        record = None
+        if "id" in id:
+            record = AudioBook.find(id["id"])
+
+        if "author" in data:
+            data['author'] = AuthorSchema().load({"name": data["author"]}, session=db.session)
+        if "narrator" in data:
+            data['narrator'] = NarratorSchema().load({"name": data["narrator"]}, session=db.session)
+        
+        # Update record if exists else return a new instance
+        return AudioBook.update(data, record) if record else AudioBook(**data)

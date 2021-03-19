@@ -39,6 +39,23 @@ class Podcast(AudioFile):
         self.host = host
         self.participants.extend(participants)
 
+    @staticmethod
+    def find(id):
+        return Podcast.query.get(id)
+
+    @staticmethod
+    def update(data, record):
+        if "name" in data:
+            record.name = data["name"]
+        if "duration" in data:
+            record.duration = data["duration"]
+        if "host" in data:
+            record.host = data["host"]
+        if "participants" in data:
+            record.participants = data["participants"]
+        
+        return record
+
     def __repr__(self):
         return f"name: {self.name}, Audio type: {self.audio_type}, Host:{self.host}"
 
@@ -56,18 +73,26 @@ class PodcastSchema(SQLAlchemyAutoSchema):
     participants = fields.List(fields.Str(validate=validate.Length(min=1, max=100)))
     uploaded_time = fields.DateTime(dump_only=True)
 
-    @post_load
-    def make_instance(self, data, **kwargs):
+    @post_load(pass_original=True)
+    def make_instance(self, data, id, **kwargs):
+        # Check if record already exists
+        record = None
+        if "id" in id:
+            record = Podcast.find(id["id"])
+
         # Make Participants field optional
         if "participants" not in data:
-            data["participants"] = []
-        
-        # Add limit of 10 participants
-        if len(data["participants"]) > 10:
-            raise ValidationError("Podcast can not have more than 10 participants")
+            data["participants"] = [] if not record else record.participants
+        else:        
+            # Add limit of 10 participants
+            if len(data["participants"]) > 10:
+                raise ValidationError("Podcast can not have more than 10 participants")
 
-        # Arrange participants in correct format and create Participant object list
-        participantList = [{"name": i} for i in data["participants"]]
-        data["participants"] = [ParticipantSchema().load(i, session=db.session) for i in participantList]
-        data["host"] = HostSchema().load({"name": data["host"]}, session=db.session)
-        return Podcast(**data)
+            # Arrange participants in correct format and create Participant object list
+            participantList = [{"name": i} for i in data["participants"]]
+            data["participants"] = [ParticipantSchema().load(i, session=db.session) for i in participantList]
+
+        if "host" in data:    
+            data["host"] = HostSchema().load({"name": data["host"]}, session=db.session)
+        
+        return Podcast(**data) if not record else Podcast.update(data, record)

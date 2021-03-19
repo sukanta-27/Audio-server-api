@@ -2,7 +2,9 @@ from api.src.models.AudioFile import AudioFile
 from api.src.models.Song import Song, SongSchema
 from api.src.models.AudioBook import AudioBook, AudioBookSchema
 from api.src.models.Podcast import Podcast, PodcastSchema
+from flask import request, jsonify
 from flask_restful import Resource
+from marshmallow import EXCLUDE
 from api import db
 
 class AudioFileResource(Resource):
@@ -53,7 +55,35 @@ class AudioFileResource(Resource):
 
     def put(self, audioFileType, audioFileID):
         if self.isValidInput(audioFileType, audioFileID):
-            pass
+            schema = None
+            model = None
+            if audioFileType == 'song':
+                model = Song
+                schema = SongSchema
+            elif audioFileType == 'podcast':
+                model = Podcast
+                schema = PodcastSchema
+            elif audioFileType == 'audiobook':
+                model = AudioBook
+                schema = AudioBookSchema
+
+            data = request.get_json()
+            record = model.query.filter_by(id=audioFileID).first()
+
+            if not data:
+                return {'Message': 'Request data is invalid'}, 400
+            if not record:
+                return {'Message': f"No {model.__name__} found with id: {audioFileID}"}, 400
+
+            # Update existing record
+            try:
+                # Pass ID to update fields for existing records using .update staticmethod for model
+                data["id"] = audioFileID
+                record = schema().load(data, session=db.session, instance=record, partial=True, unknown=EXCLUDE)
+                db.session.commit()
+            except Exception as e:
+                return str(e), 400
+            return schema().dump(record), 200
 
         return {'Message': 'AudioFileType or AudioFileID is not valid'}, 400
     
