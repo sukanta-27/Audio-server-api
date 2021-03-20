@@ -43,10 +43,6 @@ class AudioBook(AudioFile):
         self.narrator = narrator if isinstance(narrator, Narrator) else Narrator(narrator)
 
     @staticmethod
-    def find(id):
-        return AudioBook.query.get(id)
-
-    @staticmethod
     def update(data, record):
         if "name" in data:
             record.name = data["name"]
@@ -85,7 +81,7 @@ class AudioBookSchema(SQLAlchemyAutoSchema):
         # Check if record exists
         record = None
         if "id" in id:
-            record = AudioBook.find(id["id"])
+            record = AudioBook.find_by_id(id["id"])
 
         if "author" in data:
             data['author'] = AuthorSchema().load({"name": data["author"]}, session=db.session)

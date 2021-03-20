@@ -13,10 +13,6 @@ class Song(AudioFile):
     }
 
     @staticmethod
-    def find(id):
-        return Song.query.get(id)
-
-    @staticmethod
     def update(data, record):
         if "name" in data:
             record.name = data["name"]

@@ -55,10 +55,6 @@ class Podcast(AudioFile):
             self.participants.extend(participants)
 
     @staticmethod
-    def find(id):
-        return Podcast.query.get(id)
-
-    @staticmethod
     def update(data, record):
         if "name" in data:
             record.name = data["name"]
@@ -94,7 +90,7 @@ class PodcastSchema(SQLAlchemyAutoSchema):
         # Check if record already exists
         record = None
         if "id" in id:
-            record = Podcast.find(id["id"])
+            record = Podcast.find_by_id(id["id"])
 
         # Make Participants field optional
         if "participants" not in data:
