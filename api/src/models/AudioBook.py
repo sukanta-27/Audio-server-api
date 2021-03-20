@@ -30,9 +30,17 @@ class AudioBook(AudioFile):
     }
 
     def __init__(self, name, duration, author, narrator, **kwargs):
+        if not all([
+            isinstance(name, str), 
+            isinstance(duration, int), 
+            isinstance(author, (str, Author)),
+            isinstance(narrator, (str, Narrator))
+        ]):
+            raise TypeError("A required field does not have the correct type")
+
         AudioFile.__init__(self, name, duration)
-        self.author = author
-        self.narrator = narrator
+        self.author = author if isinstance(author, Author) else Author(author)
+        self.narrator = narrator if isinstance(narrator, Narrator) else Narrator(narrator)
 
     @staticmethod
     def find(id):

@@ -36,7 +36,11 @@ class Podcast(AudioFile):
 
     def __init__(self, name, duration, host, participants=[], **kwargs):
 
-        if not all([isinstance(name, str), isinstance(duration, int), isinstance(host, str)]):
+        if not all([
+            isinstance(name, str), 
+            isinstance(duration, int), 
+            isinstance(host, (str, Host))
+        ]):
             raise TypeError("A required field does not have the correct type")
 
         if len(participants) > 10:
