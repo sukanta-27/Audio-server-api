@@ -1,4 +1,4 @@
-from ..base_test import BaseTest
+from api.test.base_test import BaseTest
 from api.src.models.Song import Song, SongSchema
 
 class TestSong(BaseTest):
