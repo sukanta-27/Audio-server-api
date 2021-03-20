@@ -17,7 +17,7 @@ class Song(AudioFile):
         return Song.query.get(id)
 
     @staticmethod
-    def find(data, record):
+    def update(data, record):
         if "name" in data:
             record.name = data["name"]
         if "duration" in data:
