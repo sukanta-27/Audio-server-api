@@ -65,6 +65,7 @@ class Podcast(AudioFile):
         if "participants" in data:
             record.participants = data["participants"]
         
+        db.session.commit()
         return record
 
     def __repr__(self):

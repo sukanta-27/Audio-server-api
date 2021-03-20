@@ -79,8 +79,10 @@ class AudioFileResource(Resource):
             try:
                 # Pass ID to update fields for existing records using .update staticmethod for model
                 data["id"] = audioFileID
+                # schema.load calls post_load which internally calls update class method.
+                # update method commits the changes so no need to do it after the load.
                 record = schema().load(data, session=db.session, instance=record, partial=True, unknown=EXCLUDE)
-                db.session.commit()
+
             except Exception as e:
                 return str(e), 400
             return schema().dump(record), 200

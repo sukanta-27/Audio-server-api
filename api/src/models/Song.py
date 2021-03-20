@@ -19,6 +19,7 @@ class Song(AudioFile):
         if "duration" in data:
             record.duration = data["duration"]
         
+        db.session.commit()
         return record
 
     def __repr__(self):

@@ -52,7 +52,8 @@ class AudioBook(AudioFile):
             record.author = data["author"]
         if "narrator" in data:
             record.narrator = data["narrator"]
-        
+
+        db.session.commit()
         return record
 
     def __repr__(self):
