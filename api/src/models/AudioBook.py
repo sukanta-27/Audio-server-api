@@ -66,7 +66,7 @@ class AudioBookSchema(SQLAlchemyAutoSchema):
         model = AudioBook
         load_instance = True
     
-    id = fields.Str(dump_only=True)
+    id = fields.Integer(dump_only=True)
     name = fields.Str(required=True, validate=validate.Length(min=1, max=100))
     duration = fields.Integer(required=True, validate=validate.Range(min=0))
     # author = fields.Nested(AuthorSchema(only=('name',)))

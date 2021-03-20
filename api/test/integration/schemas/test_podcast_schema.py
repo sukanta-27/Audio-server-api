@@ -106,7 +106,6 @@ class TestPodcastSchema(BaseTest):
 
     def test_podcast_load_host_with_101_long_name_error(self):
         self.data["host"] = "b"*101
-        error = None
         with self.assertRaises(ValidationError) as e:
             podcast = self.schema().load(self.data, session=db.session)
             self.assertIn(b"'host': ['Length must be between 1 and 100.']", error)
@@ -129,7 +128,6 @@ class TestPodcastSchema(BaseTest):
         self.data["id"] = db_podcast.id
         podcast2 = self.schema().load(self.data, session=db.session,\
              instance=Podcast.find_by_name(self.data["name"]), unknown=EXCLUDE)
-        db.session.commit()
 
         self.assertIsNotNone(podcast2)
         self.assertEqual(podcast2.id, db_podcast.id)

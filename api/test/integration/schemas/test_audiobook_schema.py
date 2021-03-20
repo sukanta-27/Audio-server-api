@@ -60,53 +60,47 @@ class TestAudioBookSchema(BaseTest):
 
 
     def test_audiobook_load_name_required(self):
-        TC_data = self.data.copy()
         with self.assertRaises(ValidationError) as e:
-            TC_data.pop("name")
-            audiobook = self.schema().load(TC_data, session=db.session)
+            self.data.pop("name")
+            audiobook = self.schema().load(self.data, session=db.session)
             self.assertIn(b"'name': ['Missing data for required field.']", str(e))
 
     def test_audiobook_load_name_char_limit(self):
-        TC_data = self.data.copy()
-
         # Test load with 0 char in name
         with self.assertRaises(ValidationError) as e:
-            TC_data["name"] = ""
-            audiobook = self.schema().load(TC_data, session=db.session)
+            self.data["name"] = ""
+            audiobook = self.schema().load(self.data, session=db.session)
             self.assertIn(b"'name': ['Length must be between 1 and 100.']", str(e))
 
         # Test load with 101 char in name
         with self.assertRaises(ValidationError) as e:
-            TC_data["name"] = "b"*101
-            audiobook = self.schema().load(TC_data, session=db.session)
+            self.data["name"] = "b"*101
+            audiobook = self.schema().load(self.data, session=db.session)
             self.assertIn(b"'name': ['Length must be between 1 and 100.']", str(e))
 
     def test_audiobook_load_duration_required(self):
-        TC_data = self.data.copy()
         with self.assertRaises(ValidationError) as e:
-            TC_data.pop("duration")
-            audiobook = self.schema().load(TC_data, session=db.session)
+            self.data.pop("duration")
+            audiobook = self.schema().load(self.data, session=db.session)
             self.assertIn(b"'duration': ['Missing data for required field.']", str(e))
 
     def test_audiobook_load_duration_negative_error(self):
-        TC_data = self.data.copy()
         with self.assertRaises(ValidationError) as e:
-            TC_data["duration"] = -23
-            audiobook = self.schema().load(TC_data, session=db.session)
+            self.data["duration"] = -23
+            audiobook = self.schema().load(self.data, session=db.session)
             self.assertIn(b"'duration': ['Must be greater than or equal to 0.']", str(e))
 
     def test_audiobook_load_author_with_101_long_name_error(self):
         self.data["author"] = "b"*101
-        error = None
         with self.assertRaises(ValidationError) as e:
             audiobook = self.schema().load(self.data, session=db.session)
             self.assertIn(b"'author': ['Length must be between 1 and 100.']", error)
 
-    def test_audiobook_load_with_11_participants_error(self):
-        self.data["participants"] = [str(i) for i in range(11)]
+    def test_audiobook_load_narrator_with_101_long_name_error(self):
+        self.data["narrator"] = "b"*101
         with self.assertRaises(ValidationError) as e:
             audiobook = self.schema().load(self.data, session=db.session)
-            self.assertIn(b"['AudioBook can not have more than 10 participants']", str(e))
+            self.assertIn(b"'narrator': ['Length must be between 1 and 100.']", error)
 
     def test_audiobook_load_with_existing_record(self):
         audiobook = self.schema().load(self.data, session=db.session)
@@ -120,7 +114,6 @@ class TestAudioBookSchema(BaseTest):
         self.data["id"] = db_audiobook.id
         audiobook2 = self.schema().load(self.data, session=db.session,\
              instance=AudioBook.find_by_name(self.data["name"]), unknown=EXCLUDE)
-        db.session.commit()
 
         self.assertIsNotNone(audiobook2)
         self.assertEqual(audiobook2.id, db_audiobook.id)
