@@ -15,3 +15,11 @@ class TestSong(TestCase):
     def test_create_song_init_with_unexpected_argument(self):
         with self.assertRaises(TypeError):
             Song("name", duration=22, unexpected=234)
+
+    def test_song_repr(self):
+        song = Song("Test", 300)
+
+        self.assertEqual(
+            "name: Test, Audio type: song, Uploaded:None",
+            song.__repr__()
+        )
