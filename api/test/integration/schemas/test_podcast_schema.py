@@ -60,6 +60,10 @@ class TestPodcastSchema(BaseTest):
 
         self.assertEqual(podcast.name, self.data["name"])
         self.assertEqual(podcast.duration, self.data["duration"])
+        self.assertIsInstance(podcast.host, Host)
+        self.assertIsInstance(podcast.participants[0], Participant)
+        self.assertEqual(podcast.host.name, self.data["host"])
+        self.assertEqual(len(podcast.participants), 2)
         self.assertIsNone(podcast.uploaded_time)
         self.assertIsNone(podcast.id)
 
