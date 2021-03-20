@@ -35,9 +35,17 @@ class Podcast(AudioFile):
     }
 
     def __init__(self, name, duration, host, participants=[], **kwargs):
+
+        if len(participants) > 10:
+            raise ValidationError("Podcast cannot have more than 10 participants")
+
         AudioFile.__init__(self, name, duration)
-        self.host = host
-        self.participants.extend(participants)
+        self.host = host if isinstance(host, Host) else Host(host)
+        if all(isinstance(i, Participant) for i in participants):
+            self.participants.extend(participants)
+        else:
+            participants = [Participant(i) for i in participants]
+            self.participants.extend(participants)
 
     @staticmethod
     def find(id):
@@ -57,7 +65,8 @@ class Podcast(AudioFile):
         return record
 
     def __repr__(self):
-        return f"name: {self.name}, Audio type: {self.audio_type}, Host:{self.host}"
+        return f"name: {self.name}, Audio type: {self.audio_type}" +\
+            f", Host:{self.host}, participants: {self.participants}"
 
 class PodcastSchema(SQLAlchemyAutoSchema):
     class Meta:
