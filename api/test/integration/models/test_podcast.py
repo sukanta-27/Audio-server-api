@@ -42,7 +42,6 @@ class TestPodcast(BaseTest):
         self.assertEqual(record.host.name, "Robert")
         self.assertEqual(len(record.participants), 3)
         self.assertIsInstance(record.participants[0], Participant)
-        self.assertEqual(record.participants[0].name, "Navin")
 
     def test_get_podcast_by_id_or_name(self):
         # Check a record exists in the db
