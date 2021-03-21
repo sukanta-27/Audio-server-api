@@ -1,3 +1,4 @@
+import logging
 from api.src.models.AudioFile import AudioFile
 from api.src.models.Song import Song, SongSchema
 from api.src.models.AudioBook import AudioBook, AudioBookSchema
@@ -27,21 +28,21 @@ class AudioFileResource(Resource):
             
             if audioFileType == 'song':
                 schema = SongSchema()
-                song = Song.query.filter_by(id=audioFileID).first()
+                song = Song.find_by_id(audioFileID)
 
                 if song:
                     responseData = schema.dump(song)
 
             elif audioFileType == 'podcast':
                 schema = PodcastSchema()
-                podcast = Podcast.query.filter_by(id=audioFileID).first()
+                podcast = Podcast.find_by_id(audioFileID)
 
                 if podcast:
                     responseData = schema.dump(podcast)
 
             elif audioFileType == 'audiobook':
                 schema = AudioBookSchema()
-                audiobook = AudioBook.query.filter_by(id=audioFileID).first()
+                audiobook = AudioBook.find_by_id(audioFileID)
 
                 if audiobook:
                     responseData = schema.dump(audiobook)
@@ -49,8 +50,10 @@ class AudioFileResource(Resource):
             if responseData:
                 return responseData, 200
             
+            logging.warn(f"File with ID: {audioFileID} not found")
             return {'Message': 'File not found'}, 400
 
+        logging.warn(f"AudioFileType or AudioFileID is not validd")
         return {'Message': 'AudioFileType or AudioFileID is not valid'}, 400 
 
     def put(self, audioFileType, audioFileID):

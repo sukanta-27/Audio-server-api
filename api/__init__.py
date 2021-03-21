@@ -4,6 +4,9 @@ from flask_migrate import Migrate
 from flask_marshmallow import Marshmallow
 from flask_restful import Api
 from .config import Config
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 app.config.from_object(Config)

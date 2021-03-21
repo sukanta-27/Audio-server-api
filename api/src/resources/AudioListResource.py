@@ -1,3 +1,4 @@
+import logging
 from api.src.models.Song import Song, SongSchema
 from api.src.models.AudioBook import AudioBook, AudioBookSchema
 from api.src.models.Podcast import Podcast, PodcastSchema
@@ -35,4 +36,5 @@ class AudioListResource(Resource):
 
                 return data, 200
 
+        logging.warn(f"{audioFileType} is not a supported file type")
         return {'Message': f"{audioFileType} is not a supported file type"}, 400
