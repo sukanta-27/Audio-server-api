@@ -9,7 +9,7 @@ To setup and use the api on your local device, follow the instructions:
 To setup the environment with the packages needed to run the app, first create a virtual environment and then install the packages from the `requirements.txt`
 
 ```
-conda create --name myenv python=3.8
-pip install -r requirements.txt
+>> conda create --name myenv python=3.8
+>> pip install -r requirements.txt
 ```
 
