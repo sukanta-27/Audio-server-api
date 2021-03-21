@@ -2,6 +2,10 @@
 `Audio-server-api` is a Flask web API that simulates the behavior of an audio file 
 server while using a SQL database.
 
+## Production environment:
+The app is deployed on Heroku and can be tested using Postman or any other API testing tool. If you are testing using Postman, please feel free to download the `Audio Server API Test.postman_collection.json` [Exported as Collection v2.1] file and import it in Postman.
+### App url: https://audioapi.herokuapp.com
+
 ## Usage:
 To setup and use the api on your local device, follow the instructions:
 
