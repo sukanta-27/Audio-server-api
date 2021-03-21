@@ -4,6 +4,17 @@ from marshmallow import fields, validate
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 
 class Host(Person):
+    """
+    Host inherits from the Person base class
+
+    The relationship between the subclasses follow the "Joined Table Inheritance" (https://docs.sqlalchemy.org/en/13/orm/inheritance.html)
+
+    It holds a One-to-many relationship with the Podcast class
+
+    fields:
+        id: Integer,
+        name: String [max length = 100]
+    """    
     __tablename__ = "host"
     id = db.Column(db.Integer, db.ForeignKey('person.id'), primary_key=True)
 
