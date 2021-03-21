@@ -14,6 +14,7 @@ MarkupSafe==1.1.1
 marshmallow==3.10.0
 marshmallow-sqlalchemy==0.24.2
 pip==21.0.1
+psycopg2==2.8.6
 python-dateutil==2.8.1
 python-dotenv==0.15.0
 python-editor==1.0.4
