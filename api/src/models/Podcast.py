@@ -14,6 +14,28 @@ participantList = db.Table(
 )
 
 class Podcast(AudioFile):
+    """
+    Inherits from AudioFile class.
+
+    The relationship between theparent class and subclasses 
+    follow the "Joined Table Inheritance" (https://docs.sqlalchemy.org/en/13/orm/inheritance.html)
+
+    fields:
+        id: Integer,
+        name: String [max length = 100],
+        duratioin: Integer [Positive only],
+        audio_type: Field used for the polymorphic_on property for sqlalchemy model
+        host: can be passed as a string or a Host(Parent:Person) class
+        Participants: Holds a Many-to-many relationship with the Podcast class
+    methods:
+        classmethod: find_by_id: Return an instance from database based on id
+        classmethod: find_by_name: Retrun an instance from database based on name (first occurrance)
+        instancemethod: save_to_db(self) -> saves record to database
+        instancemethod: delete_from_db(self) -> Deletes record from database
+        
+        staticmethod: update(data, record): Updates the record with the data and commits to database
+
+    """
     __tablename__ = 'podcast'
 
     id = db.Column(db.Integer, db.ForeignKey('audiofile.id'), primary_key=True)
@@ -73,6 +95,22 @@ class Podcast(AudioFile):
             f", Host:{self.host}, participants: {self.participants}"
 
 class PodcastSchema(SQLAlchemyAutoSchema):
+    """
+    The PodcastSchema class Inherits from the marshmallow_sqlalchemy SQLAlchemyAutoSchema class.
+
+    It is used to validate the request data and serialise/deserialise the Podcast class instance
+
+    Fields shown when dumped as json:
+        ('id','name', 'duration', 'host', 'participants', 'uploaded_time')
+    
+    Fields needed to load an instance:
+        required = 'name', 'duration', 'host'
+        optional = 'participants'
+
+    host, participants fields are not nested fields, they are passed to the class as input and gets converted
+    to the correct class instance using the @post_load method. This is done to make the system a little flexible
+    for the end user.
+    """    
     class Meta:
         ordered = True
         fields = ("id", "name", "duration", "host", "participants", "uploaded_time")
