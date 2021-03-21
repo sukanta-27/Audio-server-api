@@ -6,6 +6,18 @@ from flask_restful import Resource
 from api import db
 
 class AudioListResource(Resource):
+    """
+    Inherits from the flask_restful Resource class. 
+
+    Used to get all the records of a specific audio type
+
+    Endpoint to use: {{url}}/{{audioFileType}}
+
+    Guide:
+    
+    - GET all records of a specific type:
+        https://github.com/sukanta-27/Audio-server-api/blob/master/README.md#get-all-records-for-a-specific-file-type
+    """
 
     def isValidAudioFileType(self, audioFileType):
         if audioFileType not in ['song', 'podcast', 'audiobook']:

@@ -9,13 +9,32 @@ from marshmallow import EXCLUDE
 from api import db
 
 class AudioFileResource(Resource):
+    """
+    Inherits from the flask_restful Resource class. 
 
+    Used to handle GET/PUT/DELETE request for any type of audio file type.
+
+    Endpoint to use: {{url}}/{{audioFileType}}/{{audioFileID}}
+
+    Guide:
+    
+    - GET/DELETE a record:
+         https://github.com/sukanta-27/Audio-server-api/blob/master/README.md#getdelete-a-specific-record
+    - UPDATE a record: 
+        https://github.com/sukanta-27/Audio-server-api/blob/master/README.md#update-a-record
+    """
     def isValidAudioFileType(self, audioFileType):
+        """
+        Returns if audioFileType is among the supported types or not
+        """
         if audioFileType not in ['song', 'podcast', 'audiobook']:
             return False
         return True
     
     def isValidInput(self, audioFileType, audioFileID):
+        """
+        Returns if the request data is valid or not
+        """        
         if self.isValidAudioFileType(audioFileType) and audioFileID.isnumeric():
             return True
 

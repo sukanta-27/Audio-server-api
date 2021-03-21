@@ -7,7 +7,17 @@ from api.src.models.Podcast import Podcast, PodcastSchema
 from api.src.models.AudioBook import AudioBook, AudioBookSchema
 
 class CreateAudioResource(Resource):
+    """
+    Inherits from the flask_restful Resource class. 
 
+    Used to create any type of audio file record
+
+    Endpoint to use: {{url}}/
+
+    Guide:
+    
+    - https://github.com/sukanta-27/Audio-server-api/blob/master/README.md#api-endpoints-and-how-to-use-them
+    """
     def post(self):
         data = request.get_json(force=True)
         isValid, message = self.validateJSONData(data)
