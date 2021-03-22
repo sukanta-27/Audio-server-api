@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulated Audio Server</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <style>
+        h1, h2, h3, h4 {
+            color: rgb(235, 123, 18);
+        }
+
+        .json {
+            background-color: #555;
+            color: skyblue;
+
+        }
+        
+        .jumbotron {
+            background-color: white !important;
+            width: fit-content;
+        }
+
+        .footer {
+            background-color: wheat;
+            padding-top: 5%;
+            padding-bottom: 7%;
+            text-align: center;
+        }
+
+        .heart {
+            color: red;
+        }
+
+        .wrapper {
+            margin-bottom: 0 !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="jumbotron">
+    <h1 id="audio-server-api">Audio server API</h1>
+    <p><code>Audio-server-api</code> is a Flask web API that simulates the behavior of an audio file server while using
+        a SQL database.</p>
+    <h2 id="usage">Usage:</h2>
+    <p>To setup and use the api on your local device, follow the instructions:</p>
+    <h3 id="setting-up-the-environment">Setting up the environment:</h3>
+    <p>To setup the environment with the packages needed to run the app, first create a virtual environment and then
+        install the packages from the <code>requirements.txt</code></p>
+    <pre><code>&gt;&gt; conda create --name myenv python=3.8
+&gt;&gt; pip install -r requirements.txt</code></pre>
+    <h2 id="supported-files-and-their-fields">Supported files and their fields</h2>
+    <p>The API supports 3 audio file types (<code>audioFileType</code>), they are: 1. <code>song</code> 2.
+        <code>podcast</code> 3. <code>audiobook</code></p>
+    <h3 id="song-file-fields">Song file fields:</h3>
+    <ul>
+        <li><code>id</code>: Unique identifier set automatically</li>
+        <li><code>name</code>: Name of the song, passed in request body – (mandatory, string, cannot be larger than 100
+            characters)</li>
+        <li><code>duration</code>: Duration in number of seconds, passed in request body – (mandatory, integer,
+            positive)</li>
+        <li><code>uploaded_time</code> Uploaded time, set automatically to the time when a record gets saved in the
+            database</li>
+    </ul>
+    <h3 id="podcast-file-fields">Podcast file fields:</h3>
+    <ul>
+        <li><code>id</code>: Unique identifier set automatically</li>
+        <li><code>name</code>: Name of the song, passed in request body – (mandatory, string, cannot be larger than 100
+            characters)</li>
+        <li><code>duration</code>: Duration in number of seconds, passed in request body – (mandatory, integer,
+            positive)</li>
+        <li><code>host</code>: Host of the podcast, passed in request body – (mandatory, string, cannot be larger than
+            100 characters)</li>
+        <li><code>participants</code>: Participants, passed in request body as a list of strings (optional, list of
+            strings, each string cannot be larger than 100 characters, maximum of 10 participants possible)</li>
+        <li><code>uploaded_time</code> Uploaded time, set automatically to the time when a record gets saved in the
+            database</li>
+    </ul>
+    <h3 id="audiobook-file-fields">AudioBook file fields:</h3>
+    <ul>
+        <li><code>id</code>: Unique identifier set automatically</li>
+        <li><code>name</code>: Name of the song, passed in request body – (mandatory, string, cannot be larger than 100
+            characters)</li>
+        <li><code>duration</code>: Duration in number of seconds, passed in request body – (mandatory, integer,
+            positive)</li>
+        <li><code>author</code>: Author of the song, passed in request body – (mandatory, string, cannot be larger than
+            100 characters)</li>
+        <li><code>narrator</code>: Narrator of the song, passed in request body – (mandatory, string, cannot be larger
+            than 100 characters)</li>
+        <li><code>uploaded_time</code> Uploaded time, set automatically to the time when a record gets saved in the
+            database</li>
+    </ul>
+    <h2 id="api-endpoints-and-how-to-use-them">API endpoints and how to use them:</h2>
+    <p>The api mainly have 3 endpoints, they are:
+        <ol class="">
+            <li class=""><code>url/audioFileType</code> -&gt; Get list of all records available</li>
+            <li class=""><code>url/audioFileType/audioFileID</code> -&gt; Get, update or delete a
+                specific file</li>
+            <li class=""><code>url/</code> -&gt; create a new file</li>
+        </ol>
+         
+    </p>
+    <h3 id="create-a-song">Create a Song:</h3>
+    <p>Endpoint: <code>{{url}}/</code> Request Body:</p>
+    <pre class="sourceCode json"><code class="sourceCode json">{
+    <span class="dt">&quot;audioFileType&quot;</span>: <span class="st">&quot;song&quot;</span>,
+    <span class="dt">&quot;audioFileMetadata&quot;</span>: {
+        <span class="dt">&quot;name&quot;</span>: <span class="st">&quot;Test&quot;</span>,
+        <span class="dt">&quot;duration&quot;</span>: <span class="dv">360</span>
+    }
+}</code></pre>
+    <p>Resonse status code: 200 Sample Response data if song is successfully created:</p>
+    <pre class="sourceCode json"><code class="sourceCode json">{
+    <span class="dt">&quot;id&quot;</span>: <span class="dv">30</span>,
+    <span class="dt">&quot;name&quot;</span>: <span class="st">&quot;Test&quot;</span>,
+    <span class="dt">&quot;duration&quot;</span>: <span class="dv">360</span>,
+    <span class="dt">&quot;uploaded_time&quot;</span>: <span class="st">&quot;2021-03-21T13:15:38.612827&quot;</span>
+}</code></pre>
+    <p>if there was a problem in creating a record, 400 status code will be returned. #### Conditions to keep in mind: -
+        name, duration, host is mandatory fields</p>
+    <h3 id="create-a-podcast">Create a Podcast:</h3>
+    <p>Endpoint: <code>{{url}}/</code> Request Body:</p>
+    <pre class="sourceCode json"><code class="sourceCode json">{
+    <span class="dt">&quot;audioFileType&quot;</span>: <span class="st">&quot;podcast&quot;</span>,
+    <span class="dt">&quot;audioFileMetadata&quot;</span>: {
+        <span class="dt">&quot;name&quot;</span>: <span class="st">&quot;Test podcast&quot;</span>,
+        <span class="dt">&quot;duration&quot;</span>: <span class="dv">360</span>,
+        <span class="dt">&quot;host&quot;</span>: <span class="st">&quot;Test host&quot;</span>,
+        <span class="dt">&quot;participants&quot;</span>: [
+            <span class="st">&quot;participant 1&quot;</span>,
+            <span class="st">&quot;participant 2&quot;</span>,
+            <span class="st">&quot;participant 3&quot;</span>
+        ]
+    }
+}</code></pre>
+    <p>Resonse status code: 200 Sample Response data if song is successfully created:</p>
+    <pre class="sourceCode json"><code class="sourceCode json">{
+    <span class="dt">&quot;id&quot;</span>: <span class="dv">31</span>,
+    <span class="dt">&quot;name&quot;</span>: <span class="st">&quot;Test podcast&quot;</span>,
+    <span class="dt">&quot;duration&quot;</span>: <span class="dv">360</span>,
+    <span class="dt">&quot;host&quot;</span>: <span class="st">&quot;Test host&quot;</span>,
+    <span class="dt">&quot;participants&quot;</span>: [
+        <span class="st">&quot;participant 2&quot;</span>,
+        <span class="st">&quot;participant 1&quot;</span>,
+        <span class="st">&quot;participant 3&quot;</span>
+    ],
+    <span class="dt">&quot;uploaded_time&quot;</span>: <span class="st">&quot;2021-03-21T13:22:05.923891&quot;</span>
+}</code></pre>
+    <p>if there was a problem in creating a record, 400 status code will be returned. #### Conditions to keep in mind: -
+        name, duration, host is mandatory fields - participants list is optional - participants cannot have more than 10
+        participants</p>
+    <p>If any of these conditions are not satisfied in the request body, record will not be created and 400 status code
+        will be returned along with the specific validation error.</p>
+    <h3 id="create-a-audiobook">Create a AudioBook:</h3>
+    <p>Endpoint: <code>{{url}}/</code> Request Body:</p>
+    <pre class="sourceCode json"><code class="sourceCode json">{
+    <span class="dt">&quot;audioFileType&quot;</span>: <span class="st">&quot;audiobook&quot;</span>,
+    <span class="dt">&quot;audioFileMetadata&quot;</span>: {
+        <span class="dt">&quot;name&quot;</span>: <span class="st">&quot;Test audiobook&quot;</span>,
+        <span class="dt">&quot;duration&quot;</span>: <span class="dv">3600</span>,
+        <span class="dt">&quot;author&quot;</span>: <span class="st">&quot;Test author&quot;</span>,
+        <span class="dt">&quot;narrator&quot;</span>: <span class="st">&quot;Test narrator&quot;</span>
+    }
+}</code></pre>
+    <p>Resonse status code: 200 Sample Response data if song is successfully created:</p>
+    <pre class="sourceCode json"><code class="sourceCode json">{
+    <span class="dt">&quot;id&quot;</span>: <span class="dv">32</span>,
+    <span class="dt">&quot;name&quot;</span>: <span class="st">&quot;Test audiobook&quot;</span>,
+    <span class="dt">&quot;duration&quot;</span>: <span class="dv">3600</span>,
+    <span class="dt">&quot;author&quot;</span>: <span class="st">&quot;Test author&quot;</span>,
+    <span class="dt">&quot;narrator&quot;</span>: <span class="st">&quot;Test narrator&quot;</span>,
+    <span class="dt">&quot;uploaded_time&quot;</span>: <span class="st">&quot;2021-03-21T13:27:31.020855&quot;</span>
+}</code></pre>
+    <p>if there was a problem in creating a record, 400 status code will be returned. #### Conditions to keep in mind: -
+        name, duration, author, narrator are mandatory fields</p>
+    <p>If any of these conditions are not satisfied in the request body, record will not be created and 400 status code
+        will be returned along with the specific validation error.</p>
+    <h2 id="getdelete-a-specific-record">Get/DELETE a Specific record:</h2>
+    <p>Endpoint: <code>{{url}}/{{audioFileType}}/{{audioFileID}}</code></p>
+    <h3 id="get">GET:</h3>
+    <p>Example GET request: <code>{{url}}/song/30</code></p>
+    <p>Example Response (200 OK):</p>
+    <pre class="sourceCode json"><code class="sourceCode json">{
+    <span class="dt">&quot;id&quot;</span>: <span class="dv">30</span>,
+    <span class="dt">&quot;name&quot;</span>: <span class="st">&quot;Test&quot;</span>,
+    <span class="dt">&quot;duration&quot;</span>: <span class="dv">360</span>,
+    <span class="dt">&quot;uploaded_time&quot;</span>: <span class="st">&quot;2021-03-21T13:15:38.612827&quot;</span>
+}</code></pre>
+    <h3 id="delete">DELETE:</h3>
+    <p>Example DELETE request: <code>{{url}}/song/30</code></p>
+    <p>Example Response (200 OK):</p>
+    <pre class="sourceCode json"><code class="sourceCode json">{
+    <span class="dt">&quot;Message&quot;</span>: <span class="st">&quot;Successfully deleted record&quot;</span>
+}</code></pre>
+    <h4 id="if-a-particular-id-doesnt-exist">If a particular id doesn't exist:</h4>
+    <p>Example request: <code>{{url}}/song/3334</code></p>
+    <p>Example GET Response (400 BAD REQUEST):</p>
+    <pre class="sourceCode json"><code class="sourceCode json">{
+    <span class="dt">&quot;Message&quot;</span>: <span class="st">&quot;File not found&quot;</span>
+}</code></pre>
+    <h2 id="get-all-records-for-a-specific-file-type">Get all records for a Specific File Type:</h2>
+    <p>Endpoint: <code>{{url}}/{{audioFileType}}</code></p>
+    <p>Example GET Request: <code>{{url}}/song</code></p>
+    <p>Example Response (200 OK):</p>
+    <pre class="sourceCode json"><code class="sourceCode json">[
+    {
+        <span class="dt">&quot;id&quot;</span>: <span class="dv">22</span>,
+        <span class="dt">&quot;name&quot;</span>: <span class="st">&quot;Test 1&quot;</span>,
+        <span class="dt">&quot;duration&quot;</span>: <span class="dv">250</span>,
+        <span class="dt">&quot;uploaded_time&quot;</span>: <span class="st">&quot;2021-03-19T07:49:19.748314&quot;</span>
+    },
+    {
+        <span class="dt">&quot;id&quot;</span>: <span class="dv">24</span>,
+        <span class="dt">&quot;name&quot;</span>: <span class="st">&quot;Test 2&quot;</span>,
+        <span class="dt">&quot;duration&quot;</span>: <span class="dv">233</span>,
+        <span class="dt">&quot;uploaded_time&quot;</span>: <span class="st">&quot;2021-03-19T13:36:19.857718&quot;</span>
+    },
+    {
+        <span class="dt">&quot;id&quot;</span>: <span class="dv">27</span>,
+        <span class="dt">&quot;name&quot;</span>: <span class="st">&quot;Test 3&quot;</span>,
+        <span class="dt">&quot;duration&quot;</span>: <span class="dv">233</span>,
+        <span class="dt">&quot;uploaded_time&quot;</span>: <span class="st">&quot;2021-03-21T07:44:13.501365&quot;</span>
+    }
+]</code></pre>
+    <h2 id="update-a-record">Update a Record:</h2>
+    <p>For updating a record, we need to specify the file type and file id in the request url, just like the GET or
+        DELETE method, but we also need to give the fields that we need to change with the updated values. It is to be
+        noted that, while updating a existing record, it is not required to have all the required fields (that must be
+        in the request body when creating a file)</p>
+    <p>Endpoint: <code>{{url}}/</code></p>
+    <p>Example request body to update the podcast <code>Test podcast</code> created above:</p>
+    <pre class="sourceCode json"><code class="sourceCode json">{
+    <span class="dt">&quot;duration&quot;</span>: <span class="dv">500</span>,
+    <span class="dt">&quot;participants&quot;</span>: [
+        <span class="st">&quot;Participant 4&quot;</span>
+    ]
+}</code></pre>
+    <p>Request returns the updated file data in the response body: Response (200 OK):</p>
+    <pre class="sourceCode json"><code class="sourceCode json">{
+    <span class="dt">&quot;id&quot;</span>: <span class="dv">31</span>,
+    <span class="dt">&quot;name&quot;</span>: <span class="st">&quot;Test podcast&quot;</span>,
+    <span class="dt">&quot;duration&quot;</span>: <span class="dv">500</span>,
+    <span class="dt">&quot;host&quot;</span>: <span class="st">&quot;Test host&quot;</span>,
+    <span class="dt">&quot;participants&quot;</span>: [
+        <span class="st">&quot;Participant 4&quot;</span>
+    ],
+    <span class="dt">&quot;uploaded_time&quot;</span>: <span class="st">&quot;2021-03-21T13:22:05.923891&quot;</span>
+}</code></pre>
+
+</div>
+<footer class="footer">
+    Made with <span class="heart">&hearts;</span> by <a href="https://www.linkedin.com/in/sukanta-roy-448a5856/">Sukanta Roy</a>
+</footer>
+</div>
+</body>
+
+</html>
